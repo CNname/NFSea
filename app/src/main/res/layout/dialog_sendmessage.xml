@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1">
+
+    <TextView
+        android:text="Create a new message"
+        android:layout_width="match_parent"
+        android:id="@+id/dialog_sendmessage_title"
+        android:layout_weight="0.56"
+        android:paddingTop="9dp"
+        android:paddingBottom="9dp"
+        android:paddingLeft="12dp"
+        android:layout_height="42dp"
+        android:fontFamily="sans-serif"
+        android:textAlignment="textStart"
+        android:background="@color/colorPrimary"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/messageHeading"
+        android:inputType="text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="4dp"
+        android:hint="@string/messageHeading" />
+
+    <EditText
+        android:id="@+id/messageContent"
+        android:inputType="text"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="sans-serif"
+        android:hint="@string/messageContent"
+        android:layout_width="match_parent" />
+
+</LinearLayout>

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">NFSea</string>
+    <string name="btn">Start typing and stuff</string>
+    <string name="messageHeading">Title</string>
+    <string name="messageContent">Content</string>
+    <string name="startSending">Start sending</string>
+    <string name="addMessage">Add Message</string>
+    <string name="cancel">Cancel</string>
+    <string name="receivedMessages">Received Messages</string>
+    <string name="sentMessages">Sent Messages</string>
+    <string name="bendingMessages">Bending Messages</string>
+</resources>
