@@ -25,6 +25,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import org.apache.commons.io.IOUtils;
+
 import java.nio.charset.Charset;
 
 import static android.nfc.NdefRecord.createMime;
@@ -37,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     private int sentMsgsCount;
     NfcAdapter mNfcAdapter;
     ObservableArrayList<NFSeaMessage> messages;
-    ObservableArrayList<NFSeaMessage> bendingMessages;
+    ObservableArrayList<NFSeaMessage> pendingMessages;
 
 
     @Override
@@ -46,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         setContentView(R.layout.activity_main);
 
         messages = new ObservableArrayList<>();
-        bendingMessages = new ObservableArrayList<>();
+        pendingMessages = new ObservableArrayList<>();
         db = (new NFSeaDatabase(this)).getWritableDatabase();
 
         queryData();
@@ -91,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             }
         });
 
-        bendingMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
+        pendingMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
             public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) {
 
@@ -166,16 +171,33 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
 
-        if (bendingMessages.size() == 0) return null;
+        if (pendingMessages.size() == 0) return null;
         else {
-            String message = (bendingMessages.get(0).getContent());
+
+            NdefRecord[] records = new NdefRecord[pendingMessages.size() + 1];
+            GsonBuilder builder = new GsonBuilder();
+            builder.serializeNulls(); // outputs also the null values
+
+            for (int i = 0; i < pendingMessages.size(); i++){
+
+                Gson gson = builder.create();
+                byte[] payload = gson.toJson(pendingMessages.get(i)).getBytes(Charset.forName("UTF-8"));
+
+                NdefRecord record = NdefRecord.createMime("text/plain",payload);
+                records[i] = record;
+            }
+
+            return new NdefMessage(records);
+
+            /*
+            String message = (pendingMessages.get(0).getContent());
             NdefMessage msg = new NdefMessage(
                     new NdefRecord[]{
                             createMime(
                                     "text/plain", message.getBytes(Charset.forName("UTF-8"))
                             ), NdefRecord.createApplicationRecord(getPackageName())
                     });
-            return msg;
+            return msg;*/
         }
     }
 
@@ -198,19 +220,44 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     public void processIntent(Intent intent) {
 
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+
+
+
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            GsonBuilder builder = new GsonBuilder();
+
+            if (rawMsgs != null) {
+                NdefMessage receivedMsg = (NdefMessage) rawMsgs[0];
+                NdefRecord[] records = receivedMsg.getRecords();
+
+                for (int i=0; i<records.length; i++) {
+                    Gson gson = builder.create();
+                    String jsonObj = new String(records[i].getPayload());
+
+                    if (jsonObj.equals(getPackageName())) { continue; }
+
+                    NFSeaMessage msg = gson.fromJson(jsonObj, NFSeaMessage.class);
+                    messages.add(msg);
+                }
+
+                Toast.makeText(getApplicationContext(), "Received " + records.length + " messages.", Toast.LENGTH_LONG).show();
+
+            } else {
+                Toast.makeText(getApplicationContext(), "Received nothing", Toast.LENGTH_LONG).show();
+            }
+
             // only one message sent during the beam
-            NdefMessage msg = (NdefMessage) rawMsgs[0];
+           // NdefMessage msg = (NdefMessage) rawMsgs[0];
             // record 0 contains the MIME type, record 1 is the AAR, if present
-            NFSeaMessage receivedMsg = new NFSeaMessage("Test", new String(msg.getRecords()[0].getPayload()));
-            messages.add(receivedMsg);
-            Toast.makeText(getApplicationContext(), "asdasdsa" + msg.getRecords()[0].getPayload().toString(), Toast.LENGTH_LONG).show();
+           // messages.add(new NFSeaMessage("Test", new String(msg.getRecords()[0].getPayload())));
+
+
         }
     }
 
     @Override
     public void onNdefPushComplete(NfcEvent event) {
-        bendingMessages.clear();
+        pendingMessages.clear();
         Toast.makeText(getApplicationContext(), "Push complete", Toast.LENGTH_LONG).show();
     }
 
@@ -242,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
                             db.insert("nfseaMessages", null, values);
                             queryData();
                             updateButtons();*/
-                            bendingMessages.add(new NFSeaMessage(heading, content));
+                            pendingMessages.add(new NFSeaMessage(heading, content));
 
                         }
                     })
