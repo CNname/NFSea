@@ -28,10 +28,9 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import org.apache.commons.io.IOUtils;
-
 import java.nio.charset.Charset;
 
+import static android.nfc.NdefRecord.createApplicationRecord;
 import static android.nfc.NdefRecord.createMime;
 
 public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback {
@@ -44,11 +43,15 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     ObservableArrayList<NFSeaMessage> messages;
     ObservableArrayList<NFSeaMessage> pendingMessages;
 
+    public static String PACKAGE_NAME;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        PACKAGE_NAME = getApplicationContext().getPackageName();
 
         messages = new ObservableArrayList<>();
         pendingMessages = new ObservableArrayList<>();
@@ -181,23 +184,16 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             for (int i = 0; i < pendingMessages.size(); i++){
 
                 Gson gson = builder.create();
-                byte[] payload = gson.toJson(pendingMessages.get(i)).getBytes(Charset.forName("UTF-8"));
+                String msg = gson.toJson(pendingMessages.get(i));
+                byte[] payload = msg.getBytes(Charset.forName("UTF-8"));
 
                 NdefRecord record = NdefRecord.createMime("text/plain",payload);
                 records[i] = record;
             }
 
+            records[pendingMessages.size()] = NdefRecord.createApplicationRecord(PACKAGE_NAME);
             return new NdefMessage(records);
 
-            /*
-            String message = (pendingMessages.get(0).getContent());
-            NdefMessage msg = new NdefMessage(
-                    new NdefRecord[]{
-                            createMime(
-                                    "text/plain", message.getBytes(Charset.forName("UTF-8"))
-                            ), NdefRecord.createApplicationRecord(getPackageName())
-                    });
-            return msg;*/
         }
     }
 
