@@ -56,9 +56,9 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                android.app.FragmentManager fm = getFragmentManager();
-                DialogFragment df = new SendMessageDialogFragment();
-                df.show(fm, "sendmessage");
+                //android.app.FragmentManager fm = getFragmentManager();
+               // DialogFragment df = new SendMessageDialogFragment();
+               // df.show(fm, "sendmessage");
             }
         });
 
@@ -76,8 +76,8 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             @Override
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
                 ObservableArrayList<NFSeaMessage> newMessages = (ObservableArrayList) nfSeaMessages;
-                Button receivedMsgs = (Button) findViewById(R.id.receivedMessagesBtn);
-                receivedMsgs.setText("Received messages: " + newMessages.size());
+                //Button receivedMsgs = (Button) findViewById(R.id.receivedMessagesBtn);
+                //receivedMsgs.setText("Received messages: " + newMessages.size());
             }
 
             @Override
@@ -105,8 +105,8 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             @Override
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
                 ObservableArrayList<NFSeaMessage> newMessages = (ObservableArrayList) nfSeaMessages;
-                Button bendingMsgs = (Button) findViewById(R.id.bendingMessagesBtn);
-                bendingMsgs.setText(getApplicationContext().getResources().getString(R.string.bendingMessages) + ": " + newMessages.size());
+               // Button bendingMsgs = (Button) findViewById(R.id.bendingMessagesBtn);
+               // bendingMsgs.setText(getApplicationContext().getResources().getString(R.string.bendingMessages) + ": " + newMessages.size());
             }
 
             @Override
@@ -156,11 +156,11 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
         }
 
-        Button receivedMsgs = (Button) findViewById(R.id.receivedMessagesBtn);
+        /*Button receivedMsgs = (Button) findViewById(R.id.receivedMessagesBtn);
         receivedMsgs.setText("Received messages: " + messages.size());
 
         Button sentMsgs = (Button) findViewById(R.id.sentMessageBtn);
-        sentMsgs.setText("Sent messages: " + sentMsgsCount);
+        sentMsgs.setText("Sent messages: " + sentMsgsCount); */
     }
 
     @Override
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     //@Override
     public void processIntent(Intent intent) {
 
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+      /*  if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
             // only one message sent during the beam
             NdefMessage msg = (NdefMessage) rawMsgs[0];
@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             NFSeaMessage receivedMsg = new NFSeaMessage("Test", new String(msg.getRecords()[0].getPayload()));
             messages.add(receivedMsg);
             Toast.makeText(getApplicationContext(), "asdasdsa" + msg.getRecords()[0].getPayload().toString(), Toast.LENGTH_LONG).show();
-        }
+        } */
     }
 
     @Override
@@ -214,62 +214,19 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         Toast.makeText(getApplicationContext(), "Push complete", Toast.LENGTH_LONG).show();
     }
 
-    public class SendMessageDialogFragment extends DialogFragment {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            // Get the layout inflater
-            LayoutInflater inflater = getActivity().getLayoutInflater();
-            final View inflator = inflater.inflate(R.layout.dialog_sendmessage, null);
-
-            final View addMessageView = inflater.inflate(R.layout.dialog_sendmessage, null);
-            builder.setView(addMessageView)
-                    // Add action buttons
-                    .setPositiveButton(R.string.addMessage, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            EditText titleField = (EditText) addMessageView.findViewById(R.id.messageHeading);
-                            String heading = titleField.getText().toString();
-
-                            EditText messageContent = (EditText) addMessageView.findViewById(R.id.messageContent);
-                            String content = messageContent.getText().toString();
-
-                            /*ContentValues values = new ContentValues(2);
-                            values.put("messageTitle", heading);
-                            values.put("messageContent", content);
-
-                            db.insert("nfseaMessages", null, values);
-                            queryData();
-                            updateButtons();*/
-                            bendingMessages.add(new NFSeaMessage(heading, content));
-
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-            return builder.create();
-        }
-    }
-
-
-
     public void openSentMessages(View view) {
-        Intent intent = new Intent(view.getContext(), SentMessagesActivity.class);
-        view.getContext().startActivity(intent);
+      //  Intent intent = new Intent(view.getContext(), SentMessagesActivity.class);
+      //  view.getContext().startActivity(intent);
     }
 
     public void openReceivedMessages(View view) {
-        Intent intent = new Intent(view.getContext(), ReceivedMessagesActivity.class);
+       /* Intent intent = new Intent(view.getContext(), ReceivedMessagesActivity.class);
 
         Bundle bundle = new Bundle();
         bundle.putSerializable("messages", messages);
         intent.putExtras(bundle);
 
-        view.getContext().startActivity(intent);
+        view.getContext().startActivity(intent); */
     }
 
     // close cursor and db connection
