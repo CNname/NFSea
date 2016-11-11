@@ -10,31 +10,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
+import java.util.ArrayList;
+
 public class NFSeaMessageFragment extends Fragment {
 
     private ObservableArrayList<NFSeaMessage> messages;
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_SECTION_NUMBER = "section_number";
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public NFSeaMessageFragment() {
     }
 
-    public static NFSeaMessageFragment newInstance(int columnCount) {
+    public static NFSeaMessageFragment newInstance(int sectionNumber) {
         NFSeaMessageFragment fragment = new NFSeaMessageFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
     }
@@ -44,7 +38,7 @@ public class NFSeaMessageFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            mColumnCount = getArguments().getInt(ARG_SECTION_NUMBER);
         }
     }
 
@@ -57,12 +51,20 @@ public class NFSeaMessageFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            switch (mColumnCount) {
+                case 0:
+                   // Toast.makeText(context, "Olen case 0: " +mColumnCount, Toast.LENGTH_LONG ).show();
+                case 1:
+                    recyclerView.setAdapter(new NFSeaMessageRecyclerViewAdapter(TabActivity.getMessageArray(), mListener));
+                    break;
+                case 2:
+                    recyclerView.setAdapter(new NFSeaMessageRecyclerViewAdapter(new ObservableArrayList<NFSeaMessage>(), mListener));
+                    break;
+                case 3:
+                    recyclerView.setAdapter(new NFSeaMessageRecyclerViewAdapter(TabActivity.getPendingMessagesArray(), mListener));
+                    break;
             }
-            recyclerView.setAdapter(new NFSeaMessageRecyclerViewAdapter(messages, mListener));
         }
         return view;
     }
@@ -96,7 +98,6 @@ public class NFSeaMessageFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(NFSeaMessage item);
     }
 }

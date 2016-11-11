@@ -2,6 +2,7 @@ package fi.jamk.nfsea;
 
 import android.databinding.ObservableArrayList;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,17 +22,17 @@ public class NFSeaMessageRecyclerViewAdapter extends RecyclerView.Adapter<NFSeaM
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_nfseamessage_list, parent, false);
-        TextView textView = (TextView) view.findViewById(R.id.section_label);
-        //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+                .inflate(R.layout.fragment_nfseamessage, parent, false);
+        //TextView textView = (TextView) view.findViewById(R.id.message_list_empty);
+        //textView.setText("motley crue");
         return new ViewHolder(view);
     }
 
    @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).getTitle());
-        holder.mContentView.setText(mValues.get(position).getContent());
+        holder.mIdView.setText(holder.mItem.getTitle());
+        holder.mContentView.setText(holder.mItem.getContent());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,13 +60,10 @@ public class NFSeaMessageRecyclerViewAdapter extends RecyclerView.Adapter<NFSeaM
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mIdView = (TextView) mView.findViewById(R.id.message_list_title);
+            mContentView = (TextView) mView.findViewById(R.id.message_list_content);
         }
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
-        }
+
     }
 }

@@ -9,6 +9,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.v4.app.Fragment;
@@ -23,20 +24,24 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class TabActivity extends AppCompatActivity implements SendMessageDialogFragment.SendMessageDialogListener, NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback{
+public class TabActivity extends AppCompatActivity implements SendMessageDialogFragment.SendMessageDialogListener,
+        NfcAdapter.CreateNdefMessageCallback,
+        NfcAdapter.OnNdefPushCompleteCallback,
+        NFSeaMessageFragment.OnListFragmentInteractionListener{
 
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
-    private final String DB_TABLE = "nfseaMessages";
+    private final String DB_TABLE = "messages";
     private SQLiteDatabase db;
     private Cursor cursor;
     private int sentMsgsCount;
     NfcAdapter mNfcAdapter;
     private int pendingMessagesSize;
-    ObservableArrayList<NFSeaMessage> messages;
-    ObservableArrayList<NFSeaMessage> pendingMessages;
+    private static ObservableArrayList<NFSeaMessage> messages;
+    private static ObservableArrayList<NFSeaMessage> pendingMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +59,8 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
         messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
         messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
-        messages.add(new NFSeaMessage("received title", "placeholder content", "received"));
+        messages.add(new NFSeaMessage("received title", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam at nulla eget ipsum", "received"));
+        messages.add(new NFSeaMessage("received title", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam at nulla eget ipsum", "received"));
         messages.add(new NFSeaMessage("received title", "placeholder content", "received"));
         messages.add(new NFSeaMessage("received title", "placeholder content", "received"));
         messages.add(new NFSeaMessage("received title", "placeholder content", "received"));
@@ -118,6 +124,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
                 ObservableArrayList<NFSeaMessage> newMessages = (ObservableArrayList) nfSeaMessages;
                 pendingMessagesSize = newMessages.size();
+                Toast.makeText(getApplicationContext(), "Message added to pending messages", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -127,6 +134,12 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
             public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
         });
     }
+
+    public static ObservableArrayList getMessageArray(){
+        return messages;
+    }
+
+    public static ObservableArrayList getPendingMessagesArray() { return pendingMessages; }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -167,6 +180,11 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
 
     @Override
     public void onNdefPushComplete(NfcEvent event) {
+
+    }
+
+    @Override
+    public void onListFragmentInteraction(NFSeaMessage item) {
 
     }
 
@@ -246,7 +264,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
                 case 1:
                     return getApplicationContext().getResources().getString(R.string.sentMessages);
                 case 2:
-                    return getApplicationContext().getResources().getString(R.string.pendingMessages)+ ": " + pendingMessages;
+                    return getApplicationContext().getResources().getString(R.string.pendingMessages);
             }
             return null;
         }
