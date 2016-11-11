@@ -1,7 +1,9 @@
 package fi.jamk.nfsea;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -123,8 +125,10 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             }
 
             @Override
-            public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
-
+            public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int itemCount) {
+                Button bendingMsgs = (Button) findViewById(R.id.bendingMessagesBtn);
+                bendingMsgs.setText(getApplicationContext().getResources().getString(R.string.bendingMessages) + ": " + itemCount);
+                Toast.makeText(getApplicationContext(), "Item count: " + itemCount, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -136,8 +140,9 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             finish();
             return;
         }
-        // Register callback
+        // Register callbacks
         mNfcAdapter.setNdefPushMessageCallback(this, this);
+        mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
 
         processIntent(getIntent());
 
@@ -236,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
                     messages.add(msg);
                 }
 
-                Toast.makeText(getApplicationContext(), "Received " + records.length + " messages.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Received " + (records.length-1) + " messages.", Toast.LENGTH_LONG).show();
 
             } else {
                 Toast.makeText(getApplicationContext(), "Received nothing", Toast.LENGTH_LONG).show();
@@ -254,7 +259,14 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     @Override
     public void onNdefPushComplete(NfcEvent event) {
         pendingMessages.clear();
-        Toast.makeText(getApplicationContext(), "Push complete", Toast.LENGTH_LONG).show();
+        pushComplete();
+    }
+
+    public void pushComplete() {
+        Context test = MainActivity.this;
+        Button bendingMsgs = (Button) MainActivity.this.findViewById(R.id.bendingMessagesBtn);
+        bendingMsgs.setText(MainActivity.this.getResources().getString(R.string.bendingMessages) + ": 0");
+        Toast.makeText(MainActivity.this, "Push complete", Toast.LENGTH_LONG).show();
     }
 
     public class SendMessageDialogFragment extends DialogFragment {
@@ -264,7 +276,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             // Get the layout inflater
             LayoutInflater inflater = getActivity().getLayoutInflater();
-            final View inflator = inflater.inflate(R.layout.dialog_sendmessage, null);
 
             final View addMessageView = inflater.inflate(R.layout.dialog_sendmessage, null);
             builder.setView(addMessageView)
