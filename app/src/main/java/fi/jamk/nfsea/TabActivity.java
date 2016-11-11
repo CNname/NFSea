@@ -1,12 +1,15 @@
 package fi.jamk.nfsea;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
+import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
@@ -26,6 +29,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.nio.charset.Charset;
+
 public class TabActivity extends AppCompatActivity implements SendMessageDialogFragment.SendMessageDialogListener,
         NfcAdapter.CreateNdefMessageCallback,
         NfcAdapter.OnNdefPushCompleteCallback,
@@ -42,11 +50,14 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
     private int pendingMessagesSize;
     private static ObservableArrayList<NFSeaMessage> messages;
     private static ObservableArrayList<NFSeaMessage> pendingMessages;
+    public static String PACKAGE_NAME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
+
+        PACKAGE_NAME = getApplicationContext().getPackageName();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -55,7 +66,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         queryData();
         // init messages and create dummy data for Testing
         messages = new ObservableArrayList<>();
-        messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
+       /* messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
         messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
         messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
         messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
@@ -66,7 +77,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         messages.add(new NFSeaMessage("received title", "placeholder content", "received"));
         messages.add(new NFSeaMessage("sent title", "placeholder content", "sent"));
         messages.add(new NFSeaMessage("sent title", "placeholder content", "sent"));
-        messages.add(new NFSeaMessage("sent title", "placeholder content", "sent"));
+        messages.add(new NFSeaMessage("sent title", "placeholder content", "sent")); */
 
         pendingMessages = new ObservableArrayList<>();
 
@@ -91,6 +102,19 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
             }
         });
         initObservableList();
+
+        // Check for available NFC Adapter
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+        // Register callbacks
+        mNfcAdapter.setNdefPushMessageCallback(this, this);
+        mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
+
+        processIntent(getIntent());
     }
 
     public void initObservableList() {
@@ -174,13 +198,79 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        processIntent(getIntent());
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        // onResume gets called after this to handle the intent
+        processIntent(intent);
+    }
+
+    @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        return null;
+        if (pendingMessages.size() == 0) return null;
+        else {
+
+            NdefRecord[] records = new NdefRecord[pendingMessages.size() + 1];
+            GsonBuilder builder = new GsonBuilder();
+            builder.serializeNulls(); // outputs also the null values
+
+            for (int i = 0; i < pendingMessages.size(); i++){
+
+                Gson gson = builder.create();
+                String msg = gson.toJson(pendingMessages.get(i));
+                byte[] payload = msg.getBytes(Charset.forName("UTF-8"));
+
+                NdefRecord record = NdefRecord.createMime("text/plain",payload);
+                records[i] = record;
+            }
+
+            records[pendingMessages.size()] = NdefRecord.createApplicationRecord(PACKAGE_NAME);
+            return new NdefMessage(records);
+
+        }
+    }
+
+    // Process incoming message(s)
+    public void processIntent(Intent intent) {
+
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            GsonBuilder builder = new GsonBuilder();
+
+            if (rawMsgs != null) {
+                NdefMessage receivedMsg = (NdefMessage) rawMsgs[0];
+                NdefRecord[] records = receivedMsg.getRecords();
+
+                for (int i=0; i<records.length; i++) {
+                    Gson gson = builder.create();
+                    String jsonObj = new String(records[i].getPayload());
+
+                    if (jsonObj.equals(getPackageName())) { continue; }
+
+                    NFSeaMessage msg = gson.fromJson(jsonObj, NFSeaMessage.class);
+                    messages.add(msg);
+                }
+
+                Toast.makeText(getApplicationContext(), "Received " + (records.length-1) + " messages.", Toast.LENGTH_LONG).show();
+
+            } else {
+                Toast.makeText(getApplicationContext(), "Received nothing", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
     public void onNdefPushComplete(NfcEvent event) {
+        pendingMessages.clear();
+        pushComplete();
+    }
 
+    public void pushComplete() {
+        Toast.makeText(TabActivity.this, "Push complete", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -188,55 +278,6 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
 
     }
 
-    /*  super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_received_messages);
-
-        // get messages
-        Intent intent = this.getIntent();
-        Bundle bundle = intent.getExtras();
-        messages = (ArrayList<NFSeaMessage>) bundle.getSerializable("messages");
-
-        TextView tv = (TextView) findViewById(R.id.tempTextview);
-        tv.setText("Message count: " + messages.size());*/
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_tab, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
