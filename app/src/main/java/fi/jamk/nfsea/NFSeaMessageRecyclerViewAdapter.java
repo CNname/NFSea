@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 public class NFSeaMessageRecyclerViewAdapter extends RecyclerView.Adapter<NFSeaMessageRecyclerViewAdapter.ViewHolder> {
 
-    private final NFSeaMessageFragment.OnListFragmentInteractionListener mListener;
+    public final NFSeaMessageFragment.OnListFragmentInteractionListener mListener;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private ObservableArrayList<NFSeaMessage> mValues;
 
@@ -53,15 +53,15 @@ public class NFSeaMessageRecyclerViewAdapter extends RecyclerView.Adapter<NFSeaM
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
+        public final NFSeaTextView mIdView;
+        public final NFSeaTextView mContentView;
         public NFSeaMessage mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) mView.findViewById(R.id.message_list_title);
-            mContentView = (TextView) mView.findViewById(R.id.message_list_content);
+            mIdView = (NFSeaTextView) mView.findViewById(R.id.message_list_title);
+            mContentView = (NFSeaTextView) mView.findViewById(R.id.message_list_content);
         }
 
 

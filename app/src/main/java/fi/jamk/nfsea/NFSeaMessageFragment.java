@@ -59,14 +59,17 @@ public class NFSeaMessageFragment extends Fragment {
                     recyclerView.setAdapter(new NFSeaMessageRecyclerViewAdapter(TabActivity.getMessageArray(), mListener));
                     break;
                 case 2:
-                    recyclerView.setAdapter(new NFSeaMessageRecyclerViewAdapter(new ObservableArrayList<NFSeaMessage>(), mListener));
+                    ObservableArrayList<NFSeaMessage> temp = TabActivity.getSentMessagesArray();
+                    recyclerView.setAdapter(new NFSeaMessageRecyclerViewAdapter(temp, mListener));
                     break;
                 case 3:
                     recyclerView.setAdapter(new NFSeaMessageRecyclerViewAdapter(TabActivity.getPendingMessagesArray(), mListener));
                     break;
             }
+            recyclerView.getAdapter().notifyDataSetChanged();
         }
         return view;
+
     }
 
 

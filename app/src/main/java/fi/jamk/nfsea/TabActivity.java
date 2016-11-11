@@ -48,8 +48,9 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
     private int sentMsgsCount;
     NfcAdapter mNfcAdapter;
     private int pendingMessagesSize;
-    private static ObservableArrayList<NFSeaMessage> messages;
+    private static ObservableArrayList<NFSeaMessage> receivedMessages;
     private static ObservableArrayList<NFSeaMessage> pendingMessages;
+    private static ObservableArrayList<NFSeaMessage> sentMessages;
     public static String PACKAGE_NAME;
 
     @Override
@@ -65,21 +66,9 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         db = (new NFSeaDatabase(this)).getWritableDatabase();
         queryData();
         // init messages and create dummy data for Testing
-        messages = new ObservableArrayList<>();
-       /* messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
-        messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
-        messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
-        messages.add(new NFSeaMessage("pending title", "placeholder content", "pending"));
-        messages.add(new NFSeaMessage("received title", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam at nulla eget ipsum", "received"));
-        messages.add(new NFSeaMessage("received title", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam at nulla eget ipsum", "received"));
-        messages.add(new NFSeaMessage("received title", "placeholder content", "received"));
-        messages.add(new NFSeaMessage("received title", "placeholder content", "received"));
-        messages.add(new NFSeaMessage("received title", "placeholder content", "received"));
-        messages.add(new NFSeaMessage("sent title", "placeholder content", "sent"));
-        messages.add(new NFSeaMessage("sent title", "placeholder content", "sent"));
-        messages.add(new NFSeaMessage("sent title", "placeholder content", "sent")); */
-
+        receivedMessages = new ObservableArrayList<>();
         pendingMessages = new ObservableArrayList<>();
+        sentMessages = new ObservableArrayList<>();
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -96,7 +85,6 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //android.app.FragmentManager fm = getFragmentManager();
                 SendMessageDialogFragment df = new SendMessageDialogFragment();
                 df.show(getSupportFragmentManager(), "");
             }
@@ -118,7 +106,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
     }
 
     public void initObservableList() {
-        messages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
+        receivedMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
             public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) { }
 
@@ -157,13 +145,32 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
             @Override
             public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
         });
+
+        sentMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
+            @Override
+            public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) { }
+
+            @Override
+            public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
+
+            @Override
+            public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {}
+
+            @Override
+            public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) { }
+
+            @Override
+            public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
+        });
     }
 
     public static ObservableArrayList getMessageArray(){
-        return messages;
+        return receivedMessages;
     }
 
     public static ObservableArrayList getPendingMessagesArray() { return pendingMessages; }
+
+    public static ObservableArrayList getSentMessagesArray() { return sentMessages; }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -201,6 +208,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
     public void onResume() {
         super.onResume();
         processIntent(getIntent());
+
     }
 
     @Override
@@ -252,7 +260,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
                     if (jsonObj.equals(getPackageName())) { continue; }
 
                     NFSeaMessage msg = gson.fromJson(jsonObj, NFSeaMessage.class);
-                    messages.add(msg);
+                    receivedMessages.add(msg);
                 }
 
                 Toast.makeText(getApplicationContext(), "Received " + (records.length-1) + " messages.", Toast.LENGTH_LONG).show();
@@ -265,6 +273,8 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
 
     @Override
     public void onNdefPushComplete(NfcEvent event) {
+        sentMessages.addAll(pendingMessages);
+        mSectionsPagerAdapter.notifyDataSetChanged();
         pendingMessages.clear();
         pushComplete();
     }
