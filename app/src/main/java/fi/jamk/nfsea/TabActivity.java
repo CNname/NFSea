@@ -1,5 +1,6 @@
 package fi.jamk.nfsea;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,7 +13,7 @@ import android.nfc.NfcEvent;
 import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.v4.app.Fragment;
@@ -20,18 +21,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-
-import android.widget.TextView;
+import android.widget.AdapterView;
 import android.widget.Toast;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import java.nio.charset.Charset;
 
 public class TabActivity extends AppCompatActivity implements SendMessageDialogFragment.SendMessageDialogListener,
@@ -40,14 +37,13 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         NFSeaMessageFragment.OnListFragmentInteractionListener{
 
 
+    private final int DELETE_ID = 0;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private final String DB_TABLE = "messages";
     private SQLiteDatabase db;
     private Cursor cursor;
-    private int sentMsgsCount;
     NfcAdapter mNfcAdapter;
-    private int pendingMessagesSize;
     private static ObservableArrayList<NFSeaMessage> receivedMessages;
     private static ObservableArrayList<NFSeaMessage> pendingMessages;
     private static ObservableArrayList<NFSeaMessage> sentMessages;
@@ -64,11 +60,14 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         setSupportActionBar(toolbar);
 
         db = (new NFSeaDatabase(this)).getWritableDatabase();
-        queryData();
+
+        //queryData();
         // init messages and create dummy data for Testing
         receivedMessages = new ObservableArrayList<>();
         pendingMessages = new ObservableArrayList<>();
         sentMessages = new ObservableArrayList<>();
+
+        getMessages();
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -135,7 +134,6 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
             @Override
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
                 ObservableArrayList<NFSeaMessage> newMessages = (ObservableArrayList) nfSeaMessages;
-                pendingMessagesSize = newMessages.size();
                 Toast.makeText(getApplicationContext(), "Message added to pending messages", Toast.LENGTH_SHORT).show();
             }
 
@@ -162,6 +160,22 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
             @Override
             public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
         });
+    }
+
+    public void getMessages(){
+        String[] resultColumns = new String[]{"_id","messageTitle","messageContent", "messageStatus"};
+        cursor = db.query(DB_TABLE,resultColumns,null,null,null,null,"messageTitle ASC",null);
+
+        if(cursor.moveToFirst()) {
+            do{
+                //Toast.makeText(getApplicationContext(), "received: " + cursor.getString(3), Toast.LENGTH_LONG).show();
+                if( cursor.getString(3).equals("received")){
+                    receivedMessages.add(new NFSeaMessage(cursor.getString(1), cursor.getString(2), cursor.getString(3)));
+                } else if ( cursor.getString(3).equals("sent")){
+                    sentMessages.add(new NFSeaMessage(cursor.getString(1), cursor.getString(2), cursor.getString(3)));
+                }
+            } while(cursor.moveToNext());
+        }
     }
 
     public static ObservableArrayList getMessageArray(){
@@ -260,7 +274,9 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
                     if (jsonObj.equals(getPackageName())) { continue; }
 
                     NFSeaMessage msg = gson.fromJson(jsonObj, NFSeaMessage.class);
+                    msg.setStatus("received");
                     receivedMessages.add(msg);
+                    insertData(msg);
                 }
 
                 Toast.makeText(getApplicationContext(), "Received " + (records.length-1) + " messages.", Toast.LENGTH_LONG).show();
@@ -273,22 +289,27 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
 
     @Override
     public void onNdefPushComplete(NfcEvent event) {
+        for(int i = 0; i <= pendingMessages.size(); i++){
+            pendingMessages.get(i).setStatus("sent");
+            insertData(pendingMessages.get(i));
+        }
         sentMessages.addAll(pendingMessages);
-        mSectionsPagerAdapter.notifyDataSetChanged();
-        pendingMessages.clear();
+        Toast.makeText(getApplicationContext(), "kävin täällä", Toast.LENGTH_LONG).show();
+        //mSectionsPagerAdapter.notifyDataSetChanged();
+        //pendingMessages.clear();
         pushComplete();
     }
 
     public void pushComplete() {
-        Toast.makeText(TabActivity.this, "Push complete", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Push complete", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onListFragmentInteraction(NFSeaMessage item) {
-
+        // Here comes the onLongClick events handling. Tested with toast it will appear on long click.
     }
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -321,8 +342,11 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         }
     }
 
-    public void queryData(){
-        String[] resultColumns = new String[]{"_id","messageTitle","messageContent", "messageStatus"};
-        cursor = db.query(DB_TABLE,resultColumns,null,null,null,null,"messageTitle ASC",null);
+    public void insertData(NFSeaMessage msg){
+        ContentValues values = new ContentValues();
+        values.put("messageTitle", msg.getTitle());
+        values.put("messageContent", msg.getContent());
+        values.put("messageStatus", msg.getStatus());
+        db.insert(DB_TABLE, null, values);
     }
 }

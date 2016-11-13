@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class NFSeaMessageFragment extends Fragment {
+public class NFSeaMessageFragment extends Fragment  {
 
     private ObservableArrayList<NFSeaMessage> messages;
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -22,8 +22,7 @@ public class NFSeaMessageFragment extends Fragment {
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
-    public NFSeaMessageFragment() {
-    }
+    public NFSeaMessageFragment() {}
 
     public static NFSeaMessageFragment newInstance(int sectionNumber) {
         NFSeaMessageFragment fragment = new NFSeaMessageFragment();
@@ -43,8 +42,7 @@ public class NFSeaMessageFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_nfseamessage_list, container, false);
 
         // Set the adapter
@@ -69,9 +67,7 @@ public class NFSeaMessageFragment extends Fragment {
             recyclerView.getAdapter().notifyDataSetChanged();
         }
         return view;
-
     }
-
 
     @Override
     public void onAttach(Context context) {
