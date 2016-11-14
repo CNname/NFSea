@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 
 public class SendMessageDialogFragment extends DialogFragment {
@@ -58,7 +59,11 @@ public class SendMessageDialogFragment extends DialogFragment {
                             EditText messageContent = (EditText) addMessageView.findViewById(R.id.messageContent);
                             String content = messageContent.getText().toString();
 
-                            mListener.onDialogPositiveClick(SendMessageDialogFragment.this,heading, content, STATUS);
+                            if (heading.isEmpty() && content.isEmpty()) {
+                                Toast.makeText(getContext(), "Please write something before adding a message.", Toast.LENGTH_LONG).show();
+                            } else {
+                                mListener.onDialogPositiveClick(SendMessageDialogFragment.this, heading, content, STATUS);
+                            }
 
                         }
                     })
