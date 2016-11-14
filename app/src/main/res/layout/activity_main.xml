@@ -8,15 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="fi.jamk.nfsea.MainActivity">
-
-    <Button
-        android:id="@+id/receivedMessagesBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/receivedMessages"
-        android:onClick="openReceivedMessages"
-        android:layout_marginTop="10dp"/>
+    tools:context="fi.jamk.nfsea.TabActivity">
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -28,24 +20,5 @@
         android:tint="@color/colorLight"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true" />
-
-    <Button
-        android:id="@+id/sentMessageBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/addMessage"
-        android:onClick="openSentMessages"
-        android:layout_alignBaseline="@+id/receivedMessagesBtn"
-        android:layout_alignBottom="@+id/receivedMessagesBtn"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:id="@+id/bendingMessagesBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/bendingMessages"
-        android:layout_below="@+id/receivedMessagesBtn"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="21dp" />
 
 </RelativeLayout>
