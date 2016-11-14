@@ -8,5 +8,9 @@
     <string name="cancel">Cancel</string>
     <string name="receivedMessages">Received Messages</string>
     <string name="sentMessages">Sent Messages</string>
-    <string name="bendingMessages">Bending Messages</string>
+    <string name="pendingMessages">Pending Messages</string>
+    <string name="title_activity_tab">TabActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

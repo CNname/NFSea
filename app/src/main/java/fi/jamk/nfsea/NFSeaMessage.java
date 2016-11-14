@@ -9,10 +9,12 @@ import java.io.Serializable;
 public class NFSeaMessage implements Serializable {
     private String Title;
     private String Content;
+    private String Status;
 
-    public NFSeaMessage(String title, String content) {
+    public NFSeaMessage(String title, String content, String status) {
         Title = title;
         Content = content;
+        Status = status;
     }
 
     public String getTitle() {
@@ -30,6 +32,10 @@ public class NFSeaMessage implements Serializable {
     public void setContent(String content) {
         Content = content;
     }
+
+    public String getStatus() { return Status; }
+
+    public void setStatus(String status) { Status = status; }
 
 }
 

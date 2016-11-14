@@ -11,7 +11,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class NFSeaDatabase extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "NFSea_db";
-    private final String DB_TABLE = "nfseaMessages";
+    private final String DB_TABLE_MESSAGE = "messages";
+    private final String DB_TABLE_USER = "user";
+    private String MESSAGE_STATUS = "messageStatus"; // sent, received, pending
+    private final String MESSAGE_USER = "messageUser";
     private final String MESSAGE_TITLE = "messageTitle";
     private final String MESSAGE_CONTENT = "messageContent";
 
@@ -21,12 +24,14 @@ public class NFSeaDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE "+DB_TABLE+" (_id INTEGER PRIMARY KEY AUTOINCREMENT, "+MESSAGE_TITLE+" TEXT, "+MESSAGE_CONTENT+" TEXT);");
+        db.execSQL("CREATE TABLE "+DB_TABLE_MESSAGE+" (_id INTEGER PRIMARY KEY AUTOINCREMENT, "+MESSAGE_TITLE+" TEXT, "+MESSAGE_CONTENT+" TEXT, "+MESSAGE_STATUS+" TEXT );");
+        db.execSQL("CREATE TABLE "+DB_TABLE_USER+" (_id INTEGER PRIMARY KEY AUTOINCREMENT, "+MESSAGE_USER+" TEXT);");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS "+DB_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS "+DB_TABLE_MESSAGE);
+        db.execSQL("DROP TABLE IF EXISTS "+DB_TABLE_USER);
         onCreate(db);
     }
 }
