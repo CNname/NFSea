@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
                     messages.add(msg);
                 }
 
-                Toast.makeText(getApplicationContext(), "Received " + records.length + " messages.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Received " + (records.length - 1) + " messages.", Toast.LENGTH_LONG).show();
 
             } else {
                 Toast.makeText(getApplicationContext(), "Received nothing", Toast.LENGTH_LONG).show();
