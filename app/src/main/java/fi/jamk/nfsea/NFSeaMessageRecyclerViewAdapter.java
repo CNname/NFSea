@@ -1,6 +1,7 @@
 package fi.jamk.nfsea;
 
 import android.databinding.ObservableArrayList;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -9,6 +10,9 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import static java.security.AccessController.getContext;
 
 public class NFSeaMessageRecyclerViewAdapter extends RecyclerView.Adapter<NFSeaMessageRecyclerViewAdapter.ViewHolder> {
 
@@ -43,6 +47,12 @@ public class NFSeaMessageRecyclerViewAdapter extends RecyclerView.Adapter<NFSeaM
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
                     mListener.onListFragmentInteraction(holder.mItem);
+                    Toast.makeText(holder.mContentView.getContext(),"Deleted message: " + holder.mItem.getTitle(), Toast.LENGTH_SHORT).show();
+                    mValues.remove(holder.mItem); // delete file
+
+
+
+
                    return true;
                 } else{
                     return false;

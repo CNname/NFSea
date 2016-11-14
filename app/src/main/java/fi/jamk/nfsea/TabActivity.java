@@ -1,5 +1,6 @@
 package fi.jamk.nfsea;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -113,58 +114,86 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
     public void initObservableList() {
         receivedMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
-            public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) { }
+            public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 
             @Override
-            public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
+            public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 
             @Override
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
                // ObservableArrayList<NFSeaMessage> newMessages = (ObservableArrayList) nfSeaMessages;
+                mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) { }
+            public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 
             @Override
-            public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
+            public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
         });
 
         pendingMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
-            public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) { }
+            public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 
             @Override
-            public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
+            public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 
             @Override
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
                 ObservableArrayList<NFSeaMessage> newMessages = (ObservableArrayList) nfSeaMessages;
                 Toast.makeText(getApplicationContext(), "Message added to pending messages", Toast.LENGTH_SHORT).show();
+                mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) { }
+            public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 
             @Override
-            public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
+            public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
         });
 
         sentMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
-            public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) { }
+            public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 
             @Override
-            public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
+            public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 
             @Override
-            public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {}
+            public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 
             @Override
-            public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) { }
+            public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 
             @Override
-            public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) { }
+            public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
         });
     }
 
@@ -303,9 +332,13 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         mSectionsPagerAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * onLongClick events handling.
+     * @param item
+     */
     @Override
     public void onListFragmentInteraction(NFSeaMessage item) {
-        // Here comes the onLongClick events handling. Tested with toast it will appear on long click.
+
     }
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
