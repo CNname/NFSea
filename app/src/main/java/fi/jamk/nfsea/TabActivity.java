@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
+import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -21,6 +22,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +32,8 @@ import android.widget.AdapterView;
 import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.lang.ref.WeakReference;
 import java.nio.charset.Charset;
 
 public class TabActivity extends AppCompatActivity implements SendMessageDialogFragment.SendMessageDialogListener,
@@ -48,6 +53,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
     private static ObservableArrayList<NFSeaMessage> pendingMessages;
     private static ObservableArrayList<NFSeaMessage> sentMessages;
     public static String PACKAGE_NAME;
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +83,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -198,10 +204,8 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_refresh) {
+            mSectionsPagerAdapter.notifyDataSetChanged();
         }
 
         return super.onOptionsItemSelected(item);
@@ -275,6 +279,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
                     NFSeaMessage msg = gson.fromJson(jsonObj, NFSeaMessage.class);
                     msg.setStatus("received");
                     receivedMessages.add(msg);
+                    mSectionsPagerAdapter.notifyDataSetChanged();
                     insertData(msg);
                 }
 
@@ -288,12 +293,14 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
 
     @Override
     public void onNdefPushComplete(NfcEvent event) {
-        for(int i = 0; i <= pendingMessages.size(); i++){
+        for(int i = 0; i < pendingMessages.size(); i++){
             pendingMessages.get(i).setStatus("sent");
             insertData(pendingMessages.get(i));
         }
         sentMessages.addAll(pendingMessages);
+        Log.d("After SEND", "I WAS CALLED");
         pendingMessages.clear();
+        mSectionsPagerAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -303,6 +310,10 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
+      /* NFSeaMessageFragment nf1;
+        NFSeaMessageFragment nf2;
+        NFSeaMessageFragment nf3;*/
+
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -311,7 +322,27 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
+            /*switch (position) {
+                case 0:
+                    nf1 = NFSeaMessageFragment.newInstance(position + 1);
+                    return nf1;
+                case 1:
+                    nf2 = NFSeaMessageFragment.newInstance(position + 1);
+                    return nf2;
+                case 2:
+                    nf3 = NFSeaMessageFragment.newInstance(position + 1);
+                    return nf3;
+                default:
+                    return null;
+            }*/
             return NFSeaMessageFragment.newInstance(position + 1);
+        }
+
+        @Override
+        public int getItemPosition(Object object){
+
+                return POSITION_NONE;
+
         }
 
         @Override
