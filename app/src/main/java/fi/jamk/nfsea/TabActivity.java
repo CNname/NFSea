@@ -168,7 +168,6 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
 
         if(cursor.moveToFirst()) {
             do{
-                //Toast.makeText(getApplicationContext(), "received: " + cursor.getString(3), Toast.LENGTH_LONG).show();
                 if( cursor.getString(3).equals("received")){
                     receivedMessages.add(new NFSeaMessage(cursor.getString(1), cursor.getString(2), cursor.getString(3)));
                 } else if ( cursor.getString(3).equals("sent")){
@@ -294,14 +293,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
             insertData(pendingMessages.get(i));
         }
         sentMessages.addAll(pendingMessages);
-        Toast.makeText(getApplicationContext(), "kävin täällä", Toast.LENGTH_LONG).show();
-        //mSectionsPagerAdapter.notifyDataSetChanged();
-        //pendingMessages.clear();
-        pushComplete();
-    }
-
-    public void pushComplete() {
-        Toast.makeText(getApplicationContext(), "Push complete", Toast.LENGTH_LONG).show();
+        pendingMessages.clear();
     }
 
     @Override
