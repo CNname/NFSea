@@ -1,13 +1,12 @@
 package fi.jamk.nfsea;
 
-import android.app.Activity;
+
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
-import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -20,21 +19,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.SparseArray;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import java.lang.ref.WeakReference;
 import java.nio.charset.Charset;
 
 public class TabActivity extends AppCompatActivity implements SendMessageDialogFragment.SendMessageDialogListener,
@@ -73,7 +66,6 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         sentMessages = new ObservableArrayList<>();
 
         getMessages();
-
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -113,23 +105,22 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         receivedMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
             public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) {
-               // mSectionsPagerAdapter.notifyDataSetChanged();
+
             }
 
             @Override
             public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
-                //mSectionsPagerAdapter.notifyDataSetChanged();
+
             }
 
             @Override
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
-               // ObservableArrayList<NFSeaMessage> newMessages = (ObservableArrayList) nfSeaMessages;
-               // mSectionsPagerAdapter.notifyDataSetChanged();
+
             }
 
             @Override
             public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) {
-                //mSectionsPagerAdapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -141,7 +132,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         pendingMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
             public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) {
-                //mSectionsPagerAdapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -153,12 +144,12 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
                 ObservableArrayList<NFSeaMessage> newMessages = (ObservableArrayList) nfSeaMessages;
                 Toast.makeText(getApplicationContext(), "Message added to pending messages", Toast.LENGTH_SHORT).show();
-               mSectionsPagerAdapter.notifyDataSetChanged();
+                mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) {
-                //mSectionsPagerAdapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -170,22 +161,21 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         sentMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
             public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) {
-                //mSectionsPagerAdapter.notifyDataSetChanged();
+
             }
 
             @Override
             public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
-                //mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
-                //mSectionsPagerAdapter.notifyDataSetChanged();
+
             }
 
             @Override
             public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) {
-                //mSectionsPagerAdapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -329,7 +319,6 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
             insertData(pendingMessages.get(i));
         }
         sentMessages.addAll(pendingMessages);
-        Log.d("After SEND", "I WAS CALLED");
         pendingMessages.clear();
         mSectionsPagerAdapter.notifyDataSetChanged();
     }
@@ -360,9 +349,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
 
         @Override
         public int getItemPosition(Object object){
-
-                return POSITION_NONE;
-
+            return POSITION_NONE;
         }
 
         @Override
