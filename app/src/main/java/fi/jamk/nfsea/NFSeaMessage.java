@@ -10,11 +10,19 @@ public class NFSeaMessage implements Serializable {
     private String Title;
     private String Content;
     private String Status;
+    private int id;
 
     public NFSeaMessage(String title, String content, String status) {
         Title = title;
         Content = content;
         Status = status;
+    }
+
+    public NFSeaMessage(int id, String title, String content, String status) {
+        Title = title;
+        Content = content;
+        Status = status;
+        this.id = id;
     }
 
     public String getTitle() {
@@ -37,5 +45,8 @@ public class NFSeaMessage implements Serializable {
 
     public void setStatus(String status) { Status = status; }
 
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
 }
 

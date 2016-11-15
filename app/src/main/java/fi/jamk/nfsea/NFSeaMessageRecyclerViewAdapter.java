@@ -49,10 +49,6 @@ public class NFSeaMessageRecyclerViewAdapter extends RecyclerView.Adapter<NFSeaM
                     mListener.onListFragmentInteraction(holder.mItem);
                     Toast.makeText(holder.mContentView.getContext(),"Deleted message: " + holder.mItem.getTitle(), Toast.LENGTH_SHORT).show();
                     mValues.remove(holder.mItem); // delete file
-
-
-
-
                    return true;
                 } else{
                     return false;

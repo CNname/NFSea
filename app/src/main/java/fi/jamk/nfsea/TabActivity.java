@@ -42,8 +42,6 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         NfcAdapter.OnNdefPushCompleteCallback,
         NFSeaMessageFragment.OnListFragmentInteractionListener{
 
-
-    private final int DELETE_ID = 0;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private final String DB_TABLE = "messages";
@@ -115,23 +113,23 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         receivedMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
             public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+               // mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+                //mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
                // ObservableArrayList<NFSeaMessage> newMessages = (ObservableArrayList) nfSeaMessages;
-                mSectionsPagerAdapter.notifyDataSetChanged();
+               // mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+                //mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -143,51 +141,51 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         pendingMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
             public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+                //mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+                //mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
                 ObservableArrayList<NFSeaMessage> newMessages = (ObservableArrayList) nfSeaMessages;
                 Toast.makeText(getApplicationContext(), "Message added to pending messages", Toast.LENGTH_SHORT).show();
-                mSectionsPagerAdapter.notifyDataSetChanged();
+               mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+                //mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeRemoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+               mSectionsPagerAdapter.notifyDataSetChanged();
             }
         });
 
         sentMessages.addOnListChangedCallback(new ObservableList.OnListChangedCallback<ObservableList<NFSeaMessage>>() {
             @Override
             public void onChanged(ObservableList<NFSeaMessage> nfSeaMessages) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+                //mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeChanged(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+                //mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeInserted(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+                //mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeMoved(ObservableList<NFSeaMessage> nfSeaMessages, int i, int i1, int i2) {
-                mSectionsPagerAdapter.notifyDataSetChanged();
+                //mSectionsPagerAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -197,6 +195,9 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         });
     }
 
+    /**
+     * Get messages from SQLite database and sort them into arrayLists
+     */
     public void getMessages(){
         String[] resultColumns = new String[]{"_id","messageTitle","messageContent", "messageStatus"};
         cursor = db.query(DB_TABLE,resultColumns,null,null,null,null,"messageTitle ASC",null);
@@ -204,9 +205,10 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         if(cursor.moveToFirst()) {
             do{
                 if( cursor.getString(3).equals("received")){
-                    receivedMessages.add(new NFSeaMessage(cursor.getString(1), cursor.getString(2), cursor.getString(3)));
+                    Log.i("Viestin id: ", ""+cursor.getInt(0));
+                    receivedMessages.add(new NFSeaMessage(cursor.getInt(0) ,cursor.getString(1), cursor.getString(2), cursor.getString(3)));
                 } else if ( cursor.getString(3).equals("sent")){
-                    sentMessages.add(new NFSeaMessage(cursor.getString(1), cursor.getString(2), cursor.getString(3)));
+                    sentMessages.add(new NFSeaMessage(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3)));
                 }
             } while(cursor.moveToNext());
         }
@@ -338,14 +340,11 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
      */
     @Override
     public void onListFragmentInteraction(NFSeaMessage item) {
-
+        String[] args = {String.valueOf(item.getId())};
+        db.delete("messages", "_id=?", args);
     }
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
-
-      /* NFSeaMessageFragment nf1;
-        NFSeaMessageFragment nf2;
-        NFSeaMessageFragment nf3;*/
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -355,19 +354,7 @@ public class TabActivity extends AppCompatActivity implements SendMessageDialogF
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            /*switch (position) {
-                case 0:
-                    nf1 = NFSeaMessageFragment.newInstance(position + 1);
-                    return nf1;
-                case 1:
-                    nf2 = NFSeaMessageFragment.newInstance(position + 1);
-                    return nf2;
-                case 2:
-                    nf3 = NFSeaMessageFragment.newInstance(position + 1);
-                    return nf3;
-                default:
-                    return null;
-            }*/
+
             return NFSeaMessageFragment.newInstance(position + 1);
         }
 
